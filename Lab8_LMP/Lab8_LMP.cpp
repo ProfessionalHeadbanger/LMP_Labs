@@ -49,6 +49,31 @@ void backtrack(vector<Bottle>& bottles, vector<Bottle>& best_placement, vector<B
     }
 }
 
+void backtrack(vector<Bottle>& bottles, vector<Bottle>& best_placement, vector<Bottle>& current_placement, int& best_time, vector<bool>& used, int first_con, int second_con)
+{
+    if (current_placement.size() == bottles.size())
+    {
+        if (second_con < best_time)
+        {
+            best_time = second_con;
+            best_placement = current_placement;
+        }
+        return;
+    }
+    for (int i = 0; i < bottles.size(); i++)
+    {
+        if (!used[i])
+        {
+            used[i] = true;
+            Bottle& bottle = bottles[i];
+            current_placement.push_back(bottle);
+            backtrack(bottles, best_placement, current_placement, best_time, used, first_con + bottle.fillTime, max(first_con + bottle.fillTime, second_con) + bottle.corkTime);
+            current_placement.pop_back();
+            used[i] = false;
+        }
+    }
+}
+
 void init(vector<Bottle>& bottles) {
     ifstream input("input.txt");
     int n;
@@ -72,7 +97,8 @@ int main() {
     vector<bool> used(bottles.size(), false);
     int best_time = INT_MAX;
 
-    backtrack(bottles, best_placement, current_placement, best_time, used);
+    //backtrack(bottles, best_placement, current_placement, best_time, used);
+    backtrack(bottles, best_placement, current_placement, best_time, used, 0, 0);
 
     cout << "Best placement: ";
     for (int i = 0; i < best_placement.size(); i++)
