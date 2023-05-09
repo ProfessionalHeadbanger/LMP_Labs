@@ -10,45 +10,6 @@ struct Bottle {
     int id;
 };
 
-void backtrack(vector<Bottle>& bottles, vector<Bottle>& best_placement, vector<Bottle>& current_placement, int& best_time, vector<bool>& used)
-{
-    if (current_placement.size() == bottles.size())
-    {
-        int first_con = 0;  
-        int second_con = 0;  
-        for (int i = 0; i < current_placement.size(); i++)
-        {
-            Bottle& bottle = current_placement[i];
-            first_con += bottle.fillTime;  
-            if (first_con > second_con)
-            {
-                second_con = first_con + bottle.corkTime;  
-            }
-            else
-            {
-                second_con += bottle.corkTime;  
-            }
-        }
-        if (second_con < best_time)
-        {
-            best_time = second_con;
-            best_placement = current_placement;
-            return;
-        }
-    }
-    for (int i = 0; i < bottles.size(); i++)
-    {
-        if (!used[i])
-        {
-            used[i] = true;
-            current_placement.push_back(bottles[i]);
-            backtrack(bottles, best_placement, current_placement, best_time, used);
-            current_placement.pop_back();
-            used[i] = false;
-        }
-    }
-}
-
 void backtrack(vector<Bottle>& bottles, vector<Bottle>& best_placement, vector<Bottle>& current_placement, int& best_time, vector<bool>& used, int first_con, int second_con)
 {
     if (current_placement.size() == bottles.size())
@@ -64,12 +25,15 @@ void backtrack(vector<Bottle>& bottles, vector<Bottle>& best_placement, vector<B
     {
         if (!used[i])
         {
-            used[i] = true;
             Bottle& bottle = bottles[i];
-            current_placement.push_back(bottle);
-            backtrack(bottles, best_placement, current_placement, best_time, used, first_con + bottle.fillTime, max(first_con + bottle.fillTime, second_con) + bottle.corkTime);
-            current_placement.pop_back();
-            used[i] = false;
+            if (max(first_con + bottle.fillTime, second_con) + bottle.corkTime < best_time)
+            {
+                current_placement.push_back(bottle);
+                used[i] = true;
+                backtrack(bottles, best_placement, current_placement, best_time, used, first_con + bottle.fillTime, max(first_con + bottle.fillTime, second_con) + bottle.corkTime);
+                current_placement.pop_back();
+                used[i] = false;
+            }
         }
     }
 }
@@ -97,7 +61,6 @@ int main() {
     vector<bool> used(bottles.size(), false);
     int best_time = INT_MAX;
 
-    //backtrack(bottles, best_placement, current_placement, best_time, used);
     backtrack(bottles, best_placement, current_placement, best_time, used, 0, 0);
 
     cout << "Best placement: ";
