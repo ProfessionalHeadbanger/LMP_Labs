@@ -14,32 +14,34 @@ void backtrack(vector<Bottle>& bottles, vector<Bottle>& best_placement, vector<B
 {
     if (current_placement.size() == bottles.size())
     {
-        if (second_con < best_time)
+        if (second_con < best_time || best_time == 0)
         {
             best_time = second_con;
             best_placement = current_placement;
         }
-        return;
     }
-    for (int i = 0; i < bottles.size(); i++)
+    else
     {
-        if (!used[i])
+        for (int i = 0; i < bottles.size(); i++)
         {
-            Bottle& bottle = bottles[i];
-            if (max(first_con + bottle.fillTime, second_con) + bottle.corkTime < best_time)
+            if (!used[i])
             {
-                current_placement.push_back(bottle);
-                used[i] = true;
-                backtrack(bottles, best_placement, current_placement, best_time, used, first_con + bottle.fillTime, max(first_con + bottle.fillTime, second_con) + bottle.corkTime);
-                current_placement.pop_back();
-                used[i] = false;
+                Bottle& bottle = bottles[i];
+                if (max(first_con + bottle.fillTime, second_con) + bottle.corkTime < best_time || best_time == 0)
+                {
+                    current_placement.push_back(bottle);
+                    used[i] = true;
+                    backtrack(bottles, best_placement, current_placement, best_time, used, first_con + bottle.fillTime, max(first_con + bottle.fillTime, second_con) + bottle.corkTime);
+                    current_placement.pop_back();
+                    used[i] = false;
+                }
             }
         }
     }
 }
 
 void init(vector<Bottle>& bottles) {
-    ifstream input("input.txt");
+    ifstream input("input1.txt");
     int n;
     input >> n;
 
@@ -59,7 +61,7 @@ int main() {
     vector<Bottle> best_placement;
     vector<Bottle> current_placement;
     vector<bool> used(bottles.size(), false);
-    int best_time = INT_MAX;
+    int best_time = 0;
 
     backtrack(bottles, best_placement, current_placement, best_time, used, 0, 0);
 
