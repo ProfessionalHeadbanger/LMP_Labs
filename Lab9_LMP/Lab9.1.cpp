@@ -17,7 +17,7 @@ using INFORM = struct elem
 bool check(int num)
 {
 	num = abs(num);
-	int prevDigit = 0;
+	int prevDigit = -1;
 	while (num > 0) {
 		int currentDigit = num % 10;
 		if (currentDigit <= prevDigit) {
