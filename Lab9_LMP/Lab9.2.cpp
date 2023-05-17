@@ -1,4 +1,4 @@
-//Дана прямоугольная целочисленная матрица. Распараллеливание по элементам. Посчитать количество чисел, в которых цифры упорядочены по убыванию
+//Г„Г Г­Г  ГЇГ°ГїГ¬Г®ГіГЈГ®Г«ГјГ­Г Гї Г¶ГҐГ«Г®Г·ГЁГ±Г«ГҐГ­Г­Г Гї Г¬Г ГІГ°ГЁГ¶Г . ГђГ Г±ГЇГ Г°Г Г«Г«ГҐГ«ГЁГўГ Г­ГЁГҐ ГЇГ® ГЅГ«ГҐГ¬ГҐГ­ГІГ Г¬. ГЏГ®Г±Г·ГЁГІГ ГІГј ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ® Г·ГЁГ±ГҐГ«, Гў ГЄГ®ГІГ®Г°Г»Гµ Г¶ГЁГґГ°Г» ГіГЇГ®Г°ГїГ¤Г®Г·ГҐГ­Г» ГЇГ® ГіГЎГ»ГўГ Г­ГЁГѕ
 
 #include <iostream>
 #include <thread>
@@ -11,10 +11,10 @@ size_t m = 0;
 bool check(int num)
 {
 	num = abs(num);
-	int prevDigit = 10;
+	int prevDigit = -1;
 	while (num > 0) {
 		int currentDigit = num % 10;
-		if (currentDigit >= prevDigit) {
+		if (currentDigit <= prevDigit) {
 			return false;
 		}
 		prevDigit = currentDigit;
@@ -28,7 +28,7 @@ void count_num(int** arr, int beg, int end, int& count)
 	count = 0;
 	for (int i = beg; i < end; i++)
 	{
-		if (check(arr[i / n][i % n]))
+		if (check(arr[i / m][i % m]))
 		{
 			count++;
 		}
