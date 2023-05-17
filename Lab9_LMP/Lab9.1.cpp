@@ -1,11 +1,9 @@
-//Дана прямоугольная целочисленная матрица. Распараллеливание по элементам. Посчитать количество чисел, в которых цифры упорядочены по убыванию
-
 #include <iostream>
 #include <Windows.h>
 #include <process.h>
 #include <fstream>
 
-const size_t NTHREAD = 4;
+const size_t NTHREAD = 3;
 size_t n = 0;
 size_t m = 0;
 
@@ -16,13 +14,13 @@ using INFORM = struct elem
 	int count = 0;
 };
 
-bool check(int num) 
+bool check(int num)
 {
 	num = abs(num);
-	int prevDigit = 10;
+	int prevDigit = 0;
 	while (num > 0) {
 		int currentDigit = num % 10;
-		if (currentDigit >= prevDigit) {
+		if (currentDigit <= prevDigit) {
 			return false;
 		}
 		prevDigit = currentDigit;
@@ -37,7 +35,7 @@ unsigned __stdcall count_num(void* arr)
 	inf->count = 0;
 	for (int i = inf->beg; i < inf->end; i++)
 	{
-		if (check(inf->A[i / n][i % n]))
+		if (check(inf->A[i / m][i % m]))
 		{
 			inf->count++;
 		}
