@@ -44,14 +44,27 @@ unsigned __stdcall count_num(void* arr)
 	return 0;
 }
 
+int count_num(int** arr, int beg, int end)
+{
+	int count = 0;
+	for (int i = beg; i < end; i++)
+	{
+		if (check(arr[i / m][i % m]))
+		{
+			count++;
+		}
+	}
+	return count;
+}
+
 int par_count_num(int** arr)
 {
-	HANDLE TH[NTHREAD];
-	unsigned THID[NTHREAD];
-	INFORM inf[NTHREAD];
+	HANDLE TH[NTHREAD - 1];
+	unsigned THID[NTHREAD - 1];
+	INFORM inf[NTHREAD - 1];
 	size_t size = n * m / NTHREAD;
 
-	for (size_t i = 0; i < NTHREAD; i++)
+	for (size_t i = 0; i < NTHREAD - 1; i++)
 	{
 		inf[i].A = arr;
 		inf[i].beg = i * size;
@@ -66,15 +79,16 @@ int par_count_num(int** arr)
 		}
 		TH[i] = (HANDLE)_beginthreadex(nullptr, 0, &count_num, &inf[i], 0, nullptr);
 	}
-	WaitForMultipleObjects(NTHREAD, TH, true, INFINITE);
 
-	int res_count = 0;
-	for (size_t i = 0; i < NTHREAD; i++)
+	int res_count = count_num(arr, (NTHREAD - 1) * size, n * m);
+	WaitForMultipleObjects(NTHREAD - 1, TH, true, INFINITE);
+
+	for (size_t i = 0; i < NTHREAD - 1; i++)
 	{
 		res_count += inf[i].count;
 	}
 
-	for (size_t i = 0; i < NTHREAD; i++)
+	for (size_t i = 0; i < NTHREAD - 1; i++)
 	{
 		CloseHandle(TH[i]);
 	}
