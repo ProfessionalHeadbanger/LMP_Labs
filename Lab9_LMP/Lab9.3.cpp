@@ -38,23 +38,16 @@ int count_num(int** arr, int beg, int end)
 
 int par_count_num(int** arr)
 {
-	std::future<int> TH[NTHREAD];
+	std::future<int> TH[NTHREAD - 1];
 	size_t size = n * m / NTHREAD;
 
-	for (size_t i = 0; i < NTHREAD; i++)
+	for (size_t i = 0; i < NTHREAD - 1; i++)
 	{
-		if (i == NTHREAD - 1)
-		{
-			TH[i] = std::async(std::launch::async, count_num, arr, i * size, n * m);
-		}
-		else
-		{
-			TH[i] = std::async(std::launch::async, count_num, arr, i * size, (i + 1) * size);
-		}
+		TH[i] = std::async(std::launch::async, count_num, arr, i * size, (i + 1) * size);
 	}
 
-	int res_count = 0;
-	for (size_t i = 0; i < NTHREAD; i++)
+	int res_count = count_num(arr, (NTHREAD - 1)*size, n*m);
+	for (size_t i = 0; i < NTHREAD - 1; i++)
 	{
 		res_count += TH[i].get();
 	}
