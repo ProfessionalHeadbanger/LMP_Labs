@@ -1,4 +1,4 @@
-//Äàíà ïðÿìîóãîëüíàÿ öåëî÷èñëåííàÿ ìàòðèöà. Ðàñïàðàëëåëèâàíèå ïî ýëåìåíòàì. Ïîñ÷èòàòü êîëè÷åñòâî ÷èñåë, â êîòîðûõ öèôðû óïîðÿäî÷åíû ïî óáûâàíèþ
+//Дана прямоугольная целочисленная матрица. Распараллеливание по элементам. Посчитать количество чисел, в которых цифры упорядочены по убыванию
 
 #include <iostream>
 #include <thread>
@@ -37,29 +37,23 @@ void count_num(int** arr, int beg, int end, int& count)
 
 int par_count_num(int** arr)
 {
-	std::thread TH[NTHREAD];
-	int max_count[NTHREAD];
+	std::thread TH[NTHREAD - 1];
+	int max_count[NTHREAD - 1];
 	size_t size = n * m / NTHREAD;
 
-	for (size_t i = 0; i < NTHREAD; i++)
+	for (size_t i = 0; i < NTHREAD - 1; i++)
 	{
-		if (i == NTHREAD - 1)
-		{
-			TH[i] = std::thread(count_num, arr, i * size, n * m, std::ref(max_count[i]));
-		}
-		else
-		{
-			TH[i] = std::thread(count_num, arr, i * size, (i + 1) * size, std::ref(max_count[i]));
-		}
-	}
-
-	for (int i = 0; i < NTHREAD; i++)
-	{
-		TH[i].join();
+		TH[i] = std::thread(count_num, arr, i * size, (i + 1) * size, std::ref(max_count[i]));
 	}
 
 	int res_count = 0;
-	for (size_t i = 0; i < NTHREAD; i++)
+	count_num(arr, (NTHREAD - 1) * size, n * m, res_count);
+	for (int i = 0; i < NTHREAD - 1; i++)
+	{
+		TH[i].join();
+	}
+	
+	for (size_t i = 0; i < NTHREAD - 1; i++)
 	{
 		res_count += max_count[i];
 	}
