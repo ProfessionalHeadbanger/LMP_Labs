@@ -9,9 +9,9 @@
 struct Piece
 {
 	int* begin, * end;
-	Piece(int* start = nullptr, int *end = nullptr)
+	Piece(int* begin = nullptr, int *end = nullptr)
 	{
-		this->begin = start;
+		this->begin = begin;
 		this->end = end;
 	}
 };
