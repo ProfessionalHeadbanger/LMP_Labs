@@ -1,4 +1,4 @@
-//Дана прямоугольная целочисленная матрица. Распараллеливание по элементам. Посчитать количество чисел, в которых цифры упорядочены по убыванию
+//Р”Р°РЅР° РїСЂСЏРјРѕСѓРіРѕР»СЊРЅР°СЏ С†РµР»РѕС‡РёСЃР»РµРЅРЅР°СЏ РјР°С‚СЂРёС†Р°. Р Р°СЃРїР°СЂР°Р»Р»РµР»РёРІР°РЅРёРµ РїРѕ СЌР»РµРјРµРЅС‚Р°Рј. РџРѕСЃС‡РёС‚Р°С‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ С‡РёСЃРµР», РІ РєРѕС‚РѕСЂС‹С… С†РёС„СЂС‹ СѓРїРѕСЂСЏРґРѕС‡РµРЅС‹ РїРѕ СѓР±С‹РІР°РЅРёСЋ
 
 #include <iostream>
 #include <thread>
@@ -6,17 +6,17 @@
 #include <Windows.h>
 #include <stack>
 
-struct piece
+struct Piece
 {
-	int* start, * end;
-	piece(int* start = nullptr, int *end = nullptr)
+	int* begin, * end;
+	Piece(int* start = nullptr, int *end = nullptr)
 	{
-		this->start = start;
+		this->begin = start;
 		this->end = end;
 	}
 };
 
-using TInfo = piece;
+using TInfo = Piece;
 
 class SafeStack
 {
@@ -60,7 +60,7 @@ const size_t n = 10;
 const size_t m = 10;
 const int piece_size = 9;
 volatile long res_count = 0;
-SafeStack st;
+SafeStack stack;
 
 bool check(int num)
 {
@@ -79,26 +79,25 @@ bool check(int num)
 
 int count_num(TInfo piece)
 {
-	int loc_count = 0;
-	for (int* i = piece.start; i != piece.end; i++)
+	int local_count = 0;
+	for (int* i = piece.begin; i != piece.end; i++)
 	{
 		if (check(*i))
 		{
-			loc_count++;
+			local_count++;
 		}
 	}
-
-	return loc_count;
+	return local_count;
 }
 
-void task_consumer()
+void thread_task()
 {
-	piece p;
-	while (!st.is_empty())
+	Piece piece;
+	while (!stack.is_empty())
 	{
-		if (st.try_pop(p))
+		if (stack.try_pop(piece))
 		{
-			_InterlockedExchangeAdd(&res_count, count_num(p));
+			_InterlockedExchangeAdd(&res_count, count_num(piece));
 		}
 	}
 }
@@ -111,17 +110,17 @@ void par_count_num(int* arr)
 
 	for (int i = 0; i < n * m / piece_size; i++)
 	{
-		piece p(arr + i * piece_size, arr + (i + 1) * piece_size);
-		st.push(p);
+		Piece piece(arr + i * piece_size, arr + (i + 1) * piece_size);
+		stack.push(piece);
 	}
 
 	for (size_t i = 0; i < NTHREAD - 1; i++)
 	{
-		TH[i] = std::thread(task_consumer);
+		TH[i] = std::thread(thread_task);
 	}
 
-	piece p(arr + n * m - (n * m) % piece_size, arr + n * m - (n * m) % piece_size + (n * m) % piece_size);
-	_InterlockedExchangeAdd(&res_count, count_num(p));
+	Piece piece(arr + n * m - (n * m) % piece_size, arr + n * m - (n * m) % piece_size + (n * m) % piece_size);
+	_InterlockedExchangeAdd(&res_count, count_num(piece));
 	
 	for (int i = 0; i < NTHREAD - 1; i++)
 	{
@@ -143,7 +142,6 @@ int main()
 	par_count_num(arr[0]);
 	std::cout << res_count << std::endl;
 
-	piece p(arr[0], arr[0] + n * m);
-	std::cout << count_num(p) << std::endl;
-	
+	Piece piece(arr[0], arr[0] + n * m);
+	std::cout << count_num(piece) << std::endl;
 }
