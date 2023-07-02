@@ -36,11 +36,18 @@ public:
 	{
 		bool result = false;
 		EnterCriticalSection(&cs);
-		if (!stack.empty())
+		try
 		{
-			result = true;
-			elem = stack.top();
-			stack.pop();
+			if (!stack.empty())
+			{
+				result = true;
+				elem = stack.top();
+				stack.pop();
+			}
+		}
+		catch (...)
+		{
+			LeaveCriticalSection(&cs);
 		}
 		LeaveCriticalSection(&cs);
 		return result;
